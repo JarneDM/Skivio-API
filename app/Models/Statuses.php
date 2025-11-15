@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Statuses extends Model
+{
+    protected $fillable = [
+        'name',
+        'color',
+        'position',
+        'project_id',
+    ];
+}
