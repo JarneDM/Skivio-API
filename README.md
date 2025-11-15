@@ -1,59 +1,155 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Skivio API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Backend API for [Skivio](https://github.com/JarneDM/Skivio), a collaborative Kanban board application.
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   [Features](#features)
+-   [Tech Stack](#tech-stack)
+-   [Installation](#installation)
+-   [Running the API](#running-the-api)
+-   [API Endpoints](#api-endpoints)
+-   [Authentication](#authentication)
+-   [Database Structure](#database-structure)
+-   [Contributing](#contributing)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+-   User registration and login with Laravel Sanctum
+-   CRUD operations for projects (boards), tasks, and statuses
+-   Multiple projects per user
+-   Team functionality: invite users to shared boards
+-   Task assignment to users
+-   Kanban-style workflow: Backlog, To Do, In Progress, Done
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tech Stack
 
-## Laravel Sponsors
+-   **Backend:** Laravel
+-   **Authentication:** Laravel Sanctum
+-   **Database:** MySQL / PostgreSQL
+-   **Frontend:** React (skivio-frontend)
+-   **Local Dev Environment:** Docker + DDEV
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Using DDEV
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/skivio-api.git
+cd skivio-api
+```
+
+2. Start DDEV:
+
+```bash
+ddev config --project-type=laravel --docroot=public --create-docroot
+ddev start
+```
+
+3. Install dependencies inside DDEV container:
+
+```bash
+ddev composer install
+```
+
+4. Copy `.env` file:
+
+```bash
+ddev exec cp .env.example .env
+```
+
+5. Generate application key:
+
+```bash
+ddev artisan key:generate
+```
+
+6. Run migrations and seed initial data:
+
+```bash
+ddev artisan migrate --seed
+```
+
+> Seeds create the global statuses: Backlog, To Do, In Progress, Done.
+
+## Running the API
+
+### With DDEV:
+
+```bash
+ddev artisan serve --host=0.0.0.0 --port=8000
+```
+
+Default URL: `http://127.0.0.1:8000`
+
+## API Endpoints
+
+### Auth
+
+| Method | Endpoint        | Description                    |
+| ------ | --------------- | ------------------------------ |
+| POST   | `/api/register` | Register a new user            |
+| POST   | `/api/login`    | Login a user                   |
+| POST   | `/api/logout`   | Logout the current user        |
+| GET    | `/api/me`       | Get current authenticated user |
+
+### Projects
+
+| Method | Endpoint             | Description          |
+| ------ | -------------------- | -------------------- |
+| GET    | `/api/projects`      | Get all projects     |
+| POST   | `/api/projects`      | Create a new project |
+| GET    | `/api/projects/{id}` | Get a single project |
+| PUT    | `/api/projects/{id}` | Update a project     |
+| DELETE | `/api/projects/{id}` | Delete a project     |
+
+### Tasks
+
+| Method | Endpoint          | Description       |
+| ------ | ----------------- | ----------------- |
+| GET    | `/api/tasks`      | Get all tasks     |
+| POST   | `/api/tasks`      | Create a new task |
+| GET    | `/api/tasks/{id}` | Get a single task |
+| PUT    | `/api/tasks/{id}` | Update a task     |
+| DELETE | `/api/tasks/{id}` | Delete a task     |
+
+---
+
+## Authentication
+
+The API uses token-based authentication (**Laravel Sanctum**).
+
+Include the token in the `Authorization` header for protected routes:
+
+```js
+Authorization: Bearer {token}
+```
+
+## Database Structure
+
+-   **Users:** store user information
+-   **Projects:** each project is a Kanban board
+-   **Statuses:** Backlog, To Do, In Progress, Done
+-   **Tasks:** tasks belong to a project and can be assigned to a user
+
+---
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Fork the repository
+2. Create a branch (`git checkout -b feature/my-feature`)
+3. Commit changes (`git commit -m 'Add feature'`)
+4. Push to branch (`git push origin feature/my-feature`)
+5. Open a Pull Request
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+> Developed with ❤️ by the Skivio Team (aka JarneDM)
