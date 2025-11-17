@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Statuses;
+use App\Models\Project;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $statuses = Statuses::all();
-        return response()->json($statuses);
+        $projects = Project::all();
+        return response()->json($projects);
     }
 
     public function show($id)
     {
-        $status = Statuses::findOrFail($id);
-        return response()->json($status);
+        $project = Project::findOrFail($id);
+        return response()->json($project);
     }
 
     public function add(Request $request)
@@ -28,8 +28,8 @@ class ProjectController extends Controller
             'project_id' => 'required|integer',
         ]);
 
-        $status = Statuses::create($validated);
-        return response()->json($status, 201);
+        $project = Project::create($validated);
+        return response()->json($project, 201);
     }
 
     public function update(Request $request, $id)
@@ -41,15 +41,15 @@ class ProjectController extends Controller
             'project_id' => 'sometimes|required|integer',
         ]);
 
-        $status = Statuses::findOrFail($id);
-        $status->update($validated);
-        return response()->json($status);
+        $project = Project::findOrFail($id);
+        $project->update($validated);
+        return response()->json($project);
     }
 
     public function delete($id)
     {
-        $status = Statuses::findOrFail($id);
-        $status->delete();
+        $project = Project::findOrFail($id);
+        $project->delete();
         return response()->json(null, 204);
     }
 }
