@@ -20,7 +20,7 @@ class StatusSeeder extends Seeder
             [
                 'name' => 'Backlog',
                 'color' => '#6b7280',
-                'position' => 1,
+                'position' => 0,
                 'project_id' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -28,7 +28,7 @@ class StatusSeeder extends Seeder
             [
                 'name' => 'To-Do',
                 'color' => '#3b82f6',
-                'position' => 2,
+                'position' => 1,
                 'project_id' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -36,7 +36,7 @@ class StatusSeeder extends Seeder
             [
                 'name' => 'In Progress',
                 'color' => '#f59e0b',
-                'position' => 3,
+                'position' => 2,
                 'project_id' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -44,7 +44,7 @@ class StatusSeeder extends Seeder
             [
                 'name' => 'Done',
                 'color' => '#10b981',
-                'position' => 4,
+                'position' => 3,
                 'project_id' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
