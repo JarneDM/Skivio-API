@@ -33,7 +33,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
-
+        
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

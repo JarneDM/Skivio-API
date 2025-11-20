@@ -23,9 +23,8 @@ class ProjectController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'color' => 'nullable|string|max:7',
-            'position' => 'nullable|integer',
-            'project_id' => 'required|integer',
+            'user_id' => 'required|integer',
+            'team_id' => 'nullable|integer',
         ]);
 
         $project = Project::create($validated);
@@ -36,9 +35,6 @@ class ProjectController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'color' => 'sometimes|nullable|string|max:7',
-            'position' => 'sometimes|nullable|integer',
-            'project_id' => 'sometimes|required|integer',
         ]);
 
         $project = Project::findOrFail($id);

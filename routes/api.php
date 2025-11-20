@@ -7,13 +7,16 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\ProjectController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 //user routes
 Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
+Route::post('/login', [UserController::class, 'login'])->name('login');
+Route::post('/test', function() {
+    return response()->json(['message' => 'POST works']);
+});
 Route::middleware('auth:sanctum')->get('/me', [UserController::class, 'me']);
 Route::middleware('auth:sanctum')->post('/logout', [UserController::class, 'logout']);
 
