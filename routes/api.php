@@ -18,22 +18,28 @@ Route::middleware('auth:sanctum')->get('/me', [UserController::class, 'me']);
 Route::middleware('auth:sanctum')->post('/logout', [UserController::class, 'logout']);
 
 //task routes
-Route::get('/tasks', [TaskController::class, 'index']);
-Route::get('/tasks/{id}', [TaskController::class, 'show']);
-Route::post('/tasks', [TaskController::class, 'add']);
-Route::put('/tasks/{id}', [TaskController::class, 'update']);
-Route::delete('/tasks/{id}', [TaskController::class, 'delete']);
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/tasks', [TaskController::class, 'index']);
+    Route::get('/tasks/{id}', [TaskController::class, 'show']);
+    Route::post('/tasks', [TaskController::class, 'add']);
+    Route::put('/tasks/{id}', [TaskController::class, 'update']);
+    Route::delete('/tasks/{id}', [TaskController::class, 'delete']);
+});
 
 // status routes
-Route::get('/statuses', [StatusController::class, 'index']);
-Route::get('/statuses/{id}', [StatusController::class, 'show']);
-Route::post('/statuses', [StatusController::class, 'add']);
-Route::put('/statuses/{id}', [StatusController::class, 'update']);
-Route::delete('/statuses/{id}', [StatusController::class, 'delete']);
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/statuses', [StatusController::class, 'index']);
+    Route::get('/statuses/{id}', [StatusController::class, 'show']);
+    Route::post('/statuses', [StatusController::class, 'add']);
+    Route::put('/statuses/{id}', [StatusController::class, 'update']);
+    Route::delete('/statuses/{id}', [StatusController::class, 'delete']);
+});
 
 // project routes
-Route::get('/projects', [ProjectController::class, 'index']);
-Route::get('/projects/{id}', [ProjectController::class, 'show']);
-Route::post('/projects', [ProjectController::class, 'add']);
-Route::put('/projects/{id}', [ProjectController::class, 'update']);
-Route::delete('/projects/{id}', [ProjectController::class, 'delete']);
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::get('/projects/{id}', [ProjectController::class, 'show']);
+    Route::post('/projects', [ProjectController::class, 'add']);
+    Route::put('/projects/{id}', [ProjectController::class, 'update']);
+    Route::delete('/projects/{id}', [ProjectController::class, 'delete']);
+});
