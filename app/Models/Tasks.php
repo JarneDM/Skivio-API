@@ -30,4 +30,9 @@ class Tasks extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
+
+    public function labels()
+    {
+        return $this->belongsToMany(Labels::class, 'task_label', 'task_id', 'label_id')->withTimestamps();
+    }
 }

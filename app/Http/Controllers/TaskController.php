@@ -9,23 +9,34 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    public function index()
-    {
-        $tasks = Tasks::all();
-        return response()->json($tasks);
+    public function index(Request $request)
+{
+    $projectId = $request->query('project_id') ?? $request->input('project_id');
+
+    
+    $authUser = $request->user();
+    $userId = $authUser ? $authUser->id : ($request->query('user_id') ?? $request->input('user_id'));
+
+    $query = Tasks::query();
+
+    if ($projectId) {
+        $query->where('project_id', $projectId);
     }
 
-    public function show($id)
-    {
-        $task = Tasks::findOrFail($id);
-        return response()->json($task);
+    if ($userId) {
+        $query->where('assigned_to', $userId);
     }
 
-    public function getByProject($projectId)
-    {
-        $tasks = Tasks::where('project_id', $projectId)->get();
-        return response()->json($tasks);
-    }
+    $tasks = $query->get();
+
+    return response()->json($tasks);
+}
+
+    // public function getByProject($projectId)
+    // {
+    //     $tasks = Tasks::where('project_id', $projectId)->get();
+    //     return response()->json($tasks);
+    // }
 
     public function add(Request $request)
     {   
