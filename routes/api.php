@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\LabelController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -24,7 +25,10 @@ Route::middleware('auth:sanctum')->post('/logout', [UserController::class, 'logo
 Route::middleware('auth:sanctum')->group(function() {
     Route::get('/tasks', [TaskController::class, 'index']);
     Route::get('/tasks/{id}', [TaskController::class, 'show']);
+    Route::get('/tasks/project/{projectId}', [TaskController::class, 'getByProject']);
+    Route::get('/tasks/{id}/labels', [TaskController::class, 'fethchLabels']);
     Route::post('/tasks', [TaskController::class, 'add']);
+    Route::post('/tasks/{id}/labels', [TaskController::class, 'addLabel']);
     Route::put('/tasks/{id}', [TaskController::class, 'update']);
     Route::delete('/tasks/{id}', [TaskController::class, 'delete']);
 });
@@ -45,4 +49,11 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('/projects', [ProjectController::class, 'add']);
     Route::put('/projects/{id}', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'delete']);
+});
+
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/labels', [LabelController::class, 'index']);
+    Route::post('/labels', [LabelController::class, 'add']);
+    Route::put('/labels/{id}', [LabelController::class, 'update']);
+    Route::delete('/labels/{id}', [LabelController::class, 'delete']);
 });
