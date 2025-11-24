@@ -105,6 +105,16 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
+    public function deleteTaskLabel($taskId, $labelId)
+    {
+        DB::table('task_label')
+            ->where('task_id', $taskId)
+            ->where('label_id', $labelId)
+            ->delete();
+
+        return response()->json(null, 204);
+    }
+
     public function delete($id)
     {
         $task = Tasks::findOrFail($id);

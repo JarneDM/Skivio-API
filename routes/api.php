@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('/tasks', [TaskController::class, 'add']);
     Route::post('/tasks/{id}/labels', [TaskController::class, 'addLabel']);
     Route::put('/tasks/{id}', [TaskController::class, 'update']);
+    Route::delete('/tasks/{taskId}/labels/{labelId}', [TaskController::class, 'deleteTaskLabel']);
     Route::delete('/tasks/{id}', [TaskController::class, 'delete']);
 });
 
