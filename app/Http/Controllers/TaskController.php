@@ -70,12 +70,17 @@ class TaskController extends Controller
         $position = $validated['position'] ?? null;
         unset($validated['position']);
 
+        
         $task = DB::transaction(function () use ($validated, $position) {
             // place at end if no explicit position provided
             $nextPos = (Tasks::where('status_id', $validated['status_id'])->max('position') ?? -1) + 1;
             $validated['position'] = $position ?? $nextPos;
             return Tasks::create($validated);
         });
+
+        foreach ($labels as $labelId) {
+            DB::table('task_label')->insert(['task_id' => $task->id, 'label_id' => $labelId]);
+        }
 
         if (!empty($labels)) {
             $task->labels()->sync($labels);

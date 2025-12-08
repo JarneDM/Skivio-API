@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\DB;
+
 
 class ProjectController extends Controller
 {
@@ -46,6 +48,8 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
         $project->delete();
+
+        $projectTasks = DB::table('tasks')->where('project_id', $id)->delete();
         return response()->json(null, 204);
     }
 }
