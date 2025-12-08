@@ -28,9 +28,23 @@ class TaskController extends Controller
     }
 
     $tasks = $query->get();
+    foreach ($tasks as $task) {
+        $labelIds = DB::table('task_label')->where('task_id', $task->id)->get();
+        $labels = DB::table('labels')->whereIn('id', $labelIds->pluck('label_id'))->get();
+        $task->labels = $labels;
+    }
 
     return response()->json($tasks);
 }
+
+    public function show($id)
+    {
+        $task = Tasks::findOrFail($id);
+        $labelIds = DB::table('task_label')->where('task_id', $task->id)->get();
+        $labels = DB::table('labels')->whereIn('id', $labelIds->pluck('label_id'))->get();
+        $task->labels = $labels;
+        return response()->json($task);
+    }
 
     // public function getByProject($projectId)
     // {
@@ -73,26 +87,32 @@ class TaskController extends Controller
     public function addLabel(Request $request, $id)
     {
         $validated = $request->validate([
-            'label_id' => 'required|integer',
+            'labels' => 'required|array|min:1',
+            'labels.*' => 'integer',
         ]);
 
         $task = Tasks::findOrFail($id);
 
-        DB::table('task_label')->insert([
-            'task_id' => $task->id,
-            'label_id' => $validated['label_id'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // attach new labels, keep existing
+        $ids = $validated['labels'];
+        $task->labels()->syncWithoutDetaching($ids);
 
-        return response()->json("label add successfully", 201);
+        return response()
+            ->json(["message" => "labels added successfully", "labels" => $task->labels()->get()])
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Headers', '*')
+            ->header('Access-Control-Allow-Methods', '*');
     }
 
     public function fethchLabels($id)
     {
         $labels = DB::table('task_label')->where('task_id', $id)->get();
         // echo $labels;
-        return response()->json($labels);
+        return response()
+            ->json($labels)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Headers', '*')
+            ->header('Access-Control-Allow-Methods', '*');
     }
 
     public function update(Request $request, $id)
@@ -170,7 +190,11 @@ class TaskController extends Controller
             ->where('label_id', $labelId)
             ->delete();
 
-        return response()->json(null, 204);
+        return response()
+            ->json(null, 204)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Headers', '*')
+            ->header('Access-Control-Allow-Methods', '*');
     }
 
     public function delete($id)
