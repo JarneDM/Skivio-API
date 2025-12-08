@@ -153,7 +153,7 @@ class TaskController extends Controller
             // Renumber new status column, inserting this task at requested position
             $this->renumberPositions($newStatus, $task->id, $newPosition);
 
-            return $task->fresh();
+            return $task->fresh()->load('labels');
         });
 
         return response()->json($updatedTask);
