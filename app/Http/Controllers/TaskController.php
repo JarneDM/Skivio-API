@@ -53,8 +53,15 @@ class TaskController extends Controller
 
         $labels = $validated['labels'] ?? [];
         unset($validated['labels']);
+        $position = $validated['position'] ?? null;
+        unset($validated['position']);
 
-        $task = Tasks::create($validated);
+        $task = DB::transaction(function () use ($validated, $position) {
+            // place at end if no explicit position provided
+            $nextPos = (Tasks::where('status_id', $validated['status_id'])->max('position') ?? -1) + 1;
+            $validated['position'] = $position ?? $nextPos;
+            return Tasks::create($validated);
+        });
 
         if (!empty($labels)) {
             $task->labels()->sync($labels);
@@ -101,8 +108,59 @@ class TaskController extends Controller
         ]);
 
         $task = Tasks::findOrFail($id);
-        $task->update($validated);
-        return response()->json($task);
+
+        $updatedTask = DB::transaction(function () use ($validated, $task) {
+            $originalStatus = $task->status_id;
+            $newStatus = $validated['status_id'] ?? $originalStatus;
+            $newPosition = array_key_exists('position', $validated) ? $validated['position'] : null;
+
+            // update basic fields
+            $task->fill($validated);
+
+            // If status changes and no explicit position, append at end of new column
+            if ($newStatus !== $originalStatus && $newPosition === null) {
+                $newPosition = (Tasks::where('status_id', $newStatus)->max('position') ?? -1) + 1;
+                $task->position = $newPosition;
+            }
+
+            $task->save();
+
+            // Renumber old status column if changed
+            if ($newStatus !== $originalStatus) {
+                $this->renumberPositions($originalStatus);
+            }
+
+            // Renumber new status column, inserting this task at requested position
+            $this->renumberPositions($newStatus, $task->id, $newPosition);
+
+            return $task->fresh();
+        });
+
+        return response()->json($updatedTask);
+    }
+
+    private function renumberPositions(int $statusId, ?int $pinTaskId = null, ?int $pinIndex = null): void
+    {
+        $tasks = Tasks::where('status_id', $statusId)
+            ->orderBy('position')
+            ->orderBy('id')
+            ->get();
+
+        // If we need to pin a task at a specific index, reorder accordingly
+        if ($pinTaskId !== null && $pinIndex !== null) {
+            $tasks = $tasks->filter(fn ($t) => $t->id !== $pinTaskId)->values();
+            $pinIndex = max(0, min($pinIndex, $tasks->count()));
+            $pinned = Tasks::find($pinTaskId);
+            if ($pinned) {
+                $tasks->splice($pinIndex, 0, [$pinned]);
+            }
+        }
+
+        foreach ($tasks as $index => $t) {
+            if ($t->position !== $index) {
+                $t->update(['position' => $index]);
+            }
+        }
     }
 
     public function deleteTaskLabel($taskId, $labelId)
