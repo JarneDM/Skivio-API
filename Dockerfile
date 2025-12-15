@@ -36,6 +36,11 @@ RUN composer self-update --2 && composer clear-cache
 
 WORKDIR /var/www/html
 
+# Install PHP dependencies first to ensure vendor exists
+COPY composer.json composer.lock ./
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts -vv || (cat composer.lock 2>/dev/null || echo "Install failed")
+
+# Then copy the rest of the application code
 COPY . .
 
 
@@ -43,8 +48,6 @@ COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 COPY docker/start.sh /usr/local/bin/start.sh
 RUN sed -i 's/\r$//' /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
-
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts -vv || (cat composer.lock 2>/dev/null || echo "Install failed")
 
 RUN cp .env.example .env || true
 RUN COMPOSER_MEMORY_LIMIT=-1 php artisan key:generate --force || true
