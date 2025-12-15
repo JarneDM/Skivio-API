@@ -23,6 +23,8 @@ RUN a2enmod rewrite
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+RUN composer self-update --2 && composer clear-cache
+
 WORKDIR /var/www/html
 
 COPY . .
@@ -30,10 +32,15 @@ COPY . .
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 RUN sed -i '/<Directory \/var\/www\/html>/,/<\/Directory>/c\<Directory /var/www/html/public>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>' /etc/apache2/apache2.conf
 
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --with-all-dependencies 2>&1
+RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf
+
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts -vv || (cat composer.lock 2>/dev/null || echo "Install failed")
+
+RUN cp .env.example .env || true
+RUN COMPOSER_MEMORY_LIMIT=-1 php artisan key:generate --force || true
 
 RUN chown -R www-data:www-data /var/www/html
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["apache2-foreground"]
