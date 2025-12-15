@@ -13,6 +13,9 @@ use App\Http\Controllers\LabelController;
 // })->middleware('auth:sanctum');
 
 //user routes
+Route::get('/test', function() {
+    return response()->json(['message' => 'hello world']);
+});
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login'])->name('login');
 Route::post('/test', function() {
