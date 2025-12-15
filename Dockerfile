@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
   git \
@@ -25,7 +25,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --no-progress
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --no-progress --no-dev
 
 EXPOSE 9000
 
