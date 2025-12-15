@@ -29,6 +29,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
+# why it says no changes??? this comment is to push 
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 RUN sed -i '/<Directory \/var\/www\/html>/,/<\/Directory>/c\<Directory /var/www/html/public>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>' /etc/apache2/apache2.conf
 
