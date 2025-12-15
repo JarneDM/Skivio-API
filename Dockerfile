@@ -38,7 +38,7 @@ WORKDIR /var/www/html
 
 # Install PHP dependencies first to ensure vendor exists
 COPY composer.json composer.lock ./
-RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts -vv || (cat composer.lock 2>/dev/null || echo "Install failed")
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --prefer-dist --no-scripts --no-dev --optimize-autoloader -vv
 
 # Then copy the rest of the application code
 COPY . .
